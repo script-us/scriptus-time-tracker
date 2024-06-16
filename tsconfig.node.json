@@ -1,13 +1,11 @@
 {
+  "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
+  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/**/*"],
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "CommonJS",
-    "lib": ["ESNext"],
-    "strict": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "composite": true
-  },
-  "include": ["vite.config.ts", "public/electron.js"]
+    "composite": true,
+    "types": ["electron-vite/node"],
+    "noEmit": true,
+    "moduleResolution": "Node",
+    "allowImportingTsExtensions": true
+  }
 }
