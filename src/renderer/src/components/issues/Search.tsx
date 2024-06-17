@@ -1,70 +1,75 @@
-import { faChevronRight, faSearch, faX } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { ForwardedRef, ReactNode, forwardRef, useImperativeHandle, useRef, useState } from 'react'
-import { FormattedMessage, useIntl } from 'react-intl'
-import useHotKey from '../../hooks/useHotkey'
-import { TReference } from '../../types/redmine'
-import InputField from '../general/InputField'
+import { faChevronRight, faSearch, faX } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ForwardedRef, ReactNode, forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import useHotKey from "../../hooks/useHotkey";
+import { TReference } from "../../types/redmine";
+import InputField from "../general/InputField";
 
 export type SearchQuery = {
-  searching: boolean
-  query: string
-  inProject?: TReference
-}
+  searching: boolean;
+  query: string;
+  inProject?: TReference;
+};
 
-const defaultSearchQuery: SearchQuery = { searching: false, query: '' }
+const defaultSearchQuery: SearchQuery = { searching: false, query: "" };
 
 type PropTypes = {
-  children: (state: { search: SearchQuery }) => ReactNode
-}
+  children: (state: { search: SearchQuery }) => ReactNode;
+};
 
 export type SearchRef = {
-  searchInProject: (project: TReference) => void
-}
+  searchInProject: (project: TReference) => void;
+};
 
 const Search = forwardRef(({ children }: PropTypes, ref: ForwardedRef<SearchRef>) => {
-  const { formatMessage } = useIntl()
+  const { formatMessage } = useIntl();
 
-  const searchRef = useRef<HTMLInputElement>(null)
-  const [searching, setSearching] = useState(defaultSearchQuery.searching)
-  const [query, setQuery] = useState(defaultSearchQuery.query)
-  const [inProject, setInProject] = useState<TReference | undefined>(defaultSearchQuery.inProject)
+  const searchRef = useRef<HTMLInputElement>(null);
+  const [searching, setSearching] = useState(defaultSearchQuery.searching);
+  const [query, setQuery] = useState(defaultSearchQuery.query);
+  const [inProject, setInProject] = useState<TReference | undefined>(defaultSearchQuery.inProject);
 
   useImperativeHandle(ref, () => ({
     searchInProject(project: TReference) {
-      setInProject(project)
-      setSearching(true)
-      searchRef.current?.focus()
-      searchRef.current?.select()
-    }
-  }))
+      setInProject(project);
+      setSearching(true);
+      searchRef.current?.focus();
+      searchRef.current?.select();
+    },
+  }));
 
   // hotkeys
   useHotKey(
     () => {
-      setSearching(true)
-      searchRef.current?.focus()
-      searchRef.current?.select()
+      setSearching(true);
+      searchRef.current?.focus();
+      searchRef.current?.select();
     },
-    { ctrl: true, code: 'KeyK' }
-  )
+    { ctrl: true, code: "KeyK" }
+  );
   useHotKey(
     () => {
-      setSearching(true)
-      searchRef.current?.focus()
-      searchRef.current?.select()
+      setSearching(true);
+      searchRef.current?.focus();
+      searchRef.current?.select();
     },
-    { ctrl: true, code: 'KeyF' }
-  )
+    { ctrl: true, code: "KeyF" }
+  );
   useHotKey(
     () => {
-      setSearching(false)
-      setQuery('')
-      setInProject(undefined)
+      setSearching(false);
+      setQuery("");
+      setInProject(undefined);
     },
-    { key: 'Escape' },
+    { key: "Escape" },
     searching
-  )
+  );
+
+  const handleInputChange = (e) => {
+    const sanitizedValue = e.target.value.replace(/[^a-zA-Z0-9\s]/g, "");
+    setQuery(sanitizedValue);
+  };
 
   return (
     <>
@@ -75,9 +80,9 @@ const Search = forwardRef(({ children }: PropTypes, ref: ForwardedRef<SearchRef>
             icon={<FontAwesomeIcon icon={faSearch} />}
             type="search"
             name="query"
-            placeholder={formatMessage({ id: 'issues.search' })}
+            placeholder={formatMessage({ id: "issues.search" })}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleInputChange}
             autoFocus
             autoComplete="off"
           />
@@ -88,19 +93,11 @@ const Search = forwardRef(({ children }: PropTypes, ref: ForwardedRef<SearchRef>
                 id="issues.search.search-in-project"
                 values={{
                   projectName: inProject.name,
-                  badge: (children) => (
-                    <span className="truncate rounded-full bg-primary px-1.5 text-xs text-white">
-                      {children}
-                    </span>
-                  )
+                  badge: (children) => <span className="truncate rounded-full bg-primary px-1.5 text-xs text-white">{children}</span>,
                 }}
               />
               <div className="mr-2 flex grow justify-end">
-                <FontAwesomeIcon
-                  icon={faX}
-                  className="cursor-pointer"
-                  onClick={() => setInProject(undefined)}
-                />
+                <FontAwesomeIcon icon={faX} className="cursor-pointer" onClick={() => setInProject(undefined)} />
               </div>
             </div>
           )}
@@ -110,13 +107,13 @@ const Search = forwardRef(({ children }: PropTypes, ref: ForwardedRef<SearchRef>
         search: {
           searching,
           query,
-          inProject
-        }
+          inProject,
+        },
       })}
     </>
-  )
-})
+  );
+});
 
-Search.displayName = 'Search'
+Search.displayName = "Search";
 
-export default Search
+export default Search;

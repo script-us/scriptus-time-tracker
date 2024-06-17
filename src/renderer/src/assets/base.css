@@ -1,4 +1,4 @@
-/* :root {
+:root {
   --ev-c-white: #ffffff;
   --ev-c-white-soft: #f8f8f8;
   --ev-c-white-mute: #f2f2f2;
@@ -52,19 +52,19 @@ body {
     Inter,
     -apple-system,
     BlinkMacSystemFont,
-    'Segoe UI',
+    "Segoe UI",
     Roboto,
     Oxygen,
     Ubuntu,
     Cantarell,
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
     sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-} */
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -7,16 +7,33 @@
     "src/preload/*.d.ts"
   ],
   "compilerOptions": {
-    "composite": true,
+    "target": "ESNext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "node",
+    // "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
     "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "composite": true,
     "baseUrl": ".",
     "paths": {
       "@renderer/*": [
         "src/renderer/src/*"
       ]
-    },
-    "noEmit": true,
-    "moduleResolution": "Node",
-    "allowImportingTsExtensions": true
-  }
+    }
+  },
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

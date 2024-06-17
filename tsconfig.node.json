@@ -4,8 +4,12 @@
   "compilerOptions": {
     "composite": true,
     "types": ["electron-vite/node"],
-    "noEmit": true,
-    "moduleResolution": "Node",
-    "allowImportingTsExtensions": true
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext"],
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
   }
 }
