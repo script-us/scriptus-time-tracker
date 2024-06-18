@@ -35,6 +35,7 @@ const IssuesList = ({ account, issues: rawIssues, issuePriorities, projectVersio
   const [isPause, setIsPause] = useState(false);
   const [createTimeEntry, setCreateTimeEntry] = useState<number | undefined>(undefined);
   const [currentIssue, setCurrentIssue] = useState<TIssue | null>(null);
+  const [manualData, setManualData] = useState<TIssue | null>(null);
   const groupedIssues = getGroupedIssues(getSortedIssues(rawIssues, settings.style.sortIssuesByPriority ? issuePriorities.data : [], issuesData), projectVersions?.data ?? {}, issuesData, settings);
 
   // useEffect(() => {
@@ -76,8 +77,8 @@ const IssuesList = ({ account, issues: rawIssues, issuePriorities, projectVersio
   };
   return (
     <>
-      {groupedIssues.map(({ type, project, versions, groups }) => (
-        <Fragment key={type}>
+      {groupedIssues.map(({ project, versions, groups }, index) => (
+        <Fragment key={`issue-${index}`}>
           {project && (
             <div
               className={clsx("flex justify-between gap-x-2", {
@@ -94,8 +95,8 @@ const IssuesList = ({ account, issues: rawIssues, issuePriorities, projectVersio
               )}
             </div>
           )}
-          {groups.map(({ type, version, issues }) => (
-            <>
+          {groups.map(({ type, version, issues }, index) => (
+            <Fragment key={index}>
               {settings.style.groupIssuesByVersion && versions.length > 0 && ["version", "no-version"].includes(type) && (
                 <>
                   {version && <VersionTooltip version={version} />}
@@ -253,10 +254,14 @@ const IssuesList = ({ account, issues: rawIssues, issuePriorities, projectVersio
                         },
                       });
                     }}
+                    onAddManually={() => {
+                      setManualData(issue);
+                    }}
+                    currentIssue={manualData as TIssue}
                   />
                 );
               })}
-            </>
+            </Fragment>
           ))}
         </Fragment>
       ))}

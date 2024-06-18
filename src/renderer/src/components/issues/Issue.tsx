@@ -26,6 +26,8 @@ type IssueActions = {
   setCreateTimeEntry: (args: number | undefined) => void;
   isPause: boolean;
   createTimeEntry: number | undefined;
+  onAddManually: () => void;
+  currentIssue: TIssue;
 };
 
 type PropTypes = {
@@ -58,6 +60,8 @@ const Issue = ({
   setCreateTimeEntry,
   createTimeEntry,
   isPause,
+  onAddManually,
+  currentIssue,
 }: PropTypes) => {
   const { formatMessage } = useIntl();
 
@@ -238,6 +242,7 @@ const Issue = ({
                   onOverrideTime={onOverrideTime}
                   onDoneTimer={setCreateTimeEntry}
                   createTimeEntry={createTimeEntry}
+                  onAddManually={onAddManually}
                 />
               </div>
             </div>
@@ -275,7 +280,7 @@ const Issue = ({
       {isPause === false && createTimeEntry !== undefined && (
         <CreateTimeEntryModal
           // isPause={false}
-          issue={issue}
+          issue={currentIssue}
           time={createTimeEntry}
           onClose={() => setCreateTimeEntry(undefined)}
           onSuccess={() => {

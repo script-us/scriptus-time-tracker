@@ -79,7 +79,7 @@ const convertHoursToString = (hours: number) => {
 };
 
 const convertDateToHours = (date: Date) => {
-  return Number((date.getHours() + date.getMinutes() / 60).toFixed(2));
+  return Number((date?.getHours() + date?.getMinutes() / 60).toFixed(2));
 };
 
 export default TimeField;

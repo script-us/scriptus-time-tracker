@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import logo from "../renderer/src/assets/logo.png?asset";
 
 function createWindow(): void {
-  const mode = import.meta.env.MODE;
+  // const mode = import.meta.env.MODE;
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -20,9 +20,9 @@ function createWindow(): void {
       contextIsolation: false,
     },
   });
-  if (mode === "development") {
-    mainWindow.webContents.openDevTools();
-  }
+  // if (mode === "development") {
+  //   mainWindow.webContents.openDevTools();
+  // }
 
   mainWindow.on("ready-to-show", () => {
     mainWindow.show();

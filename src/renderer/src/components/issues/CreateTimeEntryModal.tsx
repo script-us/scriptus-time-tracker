@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, isAxiosError } from "axios";
-import { startOfDay } from "date-fns";
+import { format, startOfDay } from "date-fns";
 import { FastField, Form, Formik, FormikProps, getIn } from "formik";
-import { useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import * as Yup from "yup";
 import useMyAccount from "../../hooks/useMyAccount";
@@ -48,8 +48,7 @@ type TCreateTimeEntryForm = Omit<TCreateTimeEntry, "user_id"> &
 const _defaultCachedComments = {};
 
 const CreateTimeEntryModal = ({ issue, time, isPause, onClose, onSuccess }: PropTypes) => {
-  console.log("time: ", time);
-  const { formatMessage, formatDate } = useIntl();
+  const { formatMessage } = useIntl();
   const { settings } = useSettings();
   const redmineApi = useRedmineApi();
   const queryClient = useQueryClient();
@@ -103,7 +102,7 @@ const CreateTimeEntryModal = ({ issue, time, isPause, onClose, onSuccess }: Prop
   const sevenDaysAgo = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
   const timeInHours = Number((time / 1000 / 60 / 60).toFixed(2));
   const normalizedHours = time > 0 && timeInHours < 0.02 ? 0.02 : timeInHours;
-
+  const formatSpentDate = (date) => format(date, "yyyy-MM-dd");
   return (
     <>
       <Modal
@@ -125,7 +124,7 @@ const CreateTimeEntryModal = ({ issue, time, isPause, onClose, onSuccess }: Prop
             issue_id: issue.id,
             done_ratio: issue.done_ratio,
             hours: normalizedHours,
-            spent_on: new Date(),
+            spent_on: formatSpentDate(new Date()),
             user_id: undefined,
             comments: "",
             activity_id: undefined,
@@ -145,7 +144,7 @@ const CreateTimeEntryModal = ({ issue, time, isPause, onClose, onSuccess }: Prop
               .max(24, formatMessage({ id: "issues.modal.add-spent-time.hours.validation.less-than-24" })),
             spent_on: Yup.date().max(new Date(), formatMessage({ id: "issues.modal.add-spent-time.date.validation.in-future" })),
             user_id: Yup.array(Yup.number()),
-            comments: Yup.string(),
+            comments: Yup.string().required("Comments is required"),
             activity_id: Yup.number().required(formatMessage({ id: "issues.modal.add-spent-time.activity.validation.required" })),
             add_notes: Yup.boolean(),
             notes: Yup.string(),
@@ -260,10 +259,10 @@ const CreateTimeEntryModal = ({ issue, time, isPause, onClose, onSuccess }: Prop
                       size="sm"
                       error={touched.spent_on && errors.spent_on}
                       options={{
-                        maxDate: today,
+                        maxDate: formatSpentDate(today),
                         minDate: sevenDaysAgo,
                         altInput: true,
-                        formatDate: (date: Date) => formatDate(date),
+                        formatDate: (date: Date) => formatSpentDate(date),
                       }}
                       className="col-span-2"
                       disabled={isPause}
@@ -310,6 +309,7 @@ const CreateTimeEntryModal = ({ issue, time, isPause, onClose, onSuccess }: Prop
                   <FastField
                     type="text"
                     name="comments"
+                    required
                     title={formatMessage({ id: "issues.modal.add-spent-time.comments" })}
                     placeholder={formatMessage({ id: "issues.modal.add-spent-time.comments" })}
                     as={InputField}
@@ -328,12 +328,12 @@ const CreateTimeEntryModal = ({ issue, time, isPause, onClose, onSuccess }: Prop
                     size="sm"
                     error={touched.activity_id && errors.activity_id}
                   >
-                    {timeEntryActivities.data.map((activity) => (
-                      <>
+                    {timeEntryActivities.data.map((activity, index) => (
+                      <Fragment key={index}>
                         <option key={activity.id} value={activity.id}>
                           {activity.name}
                         </option>
-                      </>
+                      </Fragment>
                     ))}
                   </FastField>
                 </Fieldset>
@@ -359,7 +359,7 @@ const CreateTimeEntryModal = ({ issue, time, isPause, onClose, onSuccess }: Prop
                   ))}
 
                 <Button type="submit" disabled={isSubmitting} className="flex items-center justify-center gap-x-2">
-                  <FormattedMessage id="issues.modal.add-spent-time.submit" />
+                  {!isSubmitting && <FormattedMessage id="issues.modal.add-spent-time.submit" />}
                   {isSubmitting && <LoadingSpinner />}
                 </Button>
               </div>
