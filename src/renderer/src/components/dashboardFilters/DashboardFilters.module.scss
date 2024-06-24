@@ -1,0 +1,37 @@
+@media (prefers-color-scheme: dark) {
+  // label {
+  //   color: white !important;
+  // }
+}
+.main {
+  display: flex;
+
+  .leftSec {
+    width: 70%;
+    .container {
+      margin-top: 20px;
+    }
+  }
+  .rightSec {
+    width: 30%;
+    margin-left: 15px;
+    .rightSecBtn > button {
+      width: 89px;
+      margin: 10px;
+    }
+  }
+  .rightSec > button {
+    margin: 10px;
+    width: 202px;
+  }
+  .label {
+    margin-top: 20px !important;
+  }
+}
+.btn {
+  margin: 10px;
+  width: 202px;
+}
+.applyBtn {
+  margin-top: 30px;
+}

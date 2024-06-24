@@ -2,19 +2,19 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useRedmineApi } from "../provider/RedmineApiProvider";
 
-const AUTO_REFRESH_DATA_INTERVAL = 1000 * 60 * 15;
-const STALE_DATA_TIME = 1000 * 60;
+const AUTO_REFRESH_DATA_INTERVAL = 1000;
+const STALE_DATA_TIME = 1000;
 
-const useMyTimeEntries = (from: Date, to: Date) => {
+const useTimeEntries = (from: Date, to: Date, user_id?: string) => {
   const redmineApi = useRedmineApi();
 
   const entriesQuery = useInfiniteQuery({
     queryKey: ["timeEntries", from, to],
     initialPageParam: 0,
-    queryFn: ({ pageParam }) => redmineApi.getAllMyTimeEntries(from, to, pageParam * 100, 100),
+    queryFn: ({ pageParam }) => redmineApi.getAllTimeEntries(from, to, pageParam * 100, 100, user_id),
     getNextPageParam: (lastPage, allPages) => (lastPage?.length === 100 ? allPages?.length : undefined),
     staleTime: STALE_DATA_TIME,
-    refetchInterval: AUTO_REFRESH_DATA_INTERVAL,
+    // refetchInterval: AUTO_REFRESH_DATA_INTERVAL,
   });
 
   // auto fetch all pages
@@ -28,7 +28,8 @@ const useMyTimeEntries = (from: Date, to: Date) => {
     data: entries,
     isLoading: entriesQuery.isLoading,
     isError: entriesQuery.isError,
+    refetch: entriesQuery.refetch,
   };
 };
 
-export default useMyTimeEntries;
+export default useTimeEntries;

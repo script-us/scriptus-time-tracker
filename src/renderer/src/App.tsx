@@ -1,7 +1,7 @@
 // import Versions from './components/Versions'
 // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
 
-import { faGear, faList, faStopwatch } from "@fortawesome/free-solid-svg-icons";
+import { faGear, faList, faStopwatch, faHome } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import { Suspense, lazy, useEffect } from "react";
@@ -52,6 +52,11 @@ function App(): JSX.Element {
               icon: <FontAwesomeIcon icon={faGear} />,
               name: formatMessage({ id: "nav.tabs.settings" }),
             },
+            {
+              href: "/dashboard",
+              icon: <FontAwesomeIcon icon={faHome} />,
+              name: formatMessage({ id: "Dashboard" }),
+            },
           ]}
         />
       </header>
@@ -61,7 +66,7 @@ function App(): JSX.Element {
           "h-[calc(100vh-3rem)]": locationType === "popout",
         })}
       >
-        <div className="p-2">
+        <div>
           <Routes>
             <Route index element={<Navigate to="/settings" replace />} />
 
@@ -69,7 +74,9 @@ function App(): JSX.Element {
               path="/issues"
               element={
                 <Suspense>
-                  <IssuesPage />
+                  <div className="p-2">
+                    <IssuesPage />
+                  </div>
                 </Suspense>
               }
             />
@@ -77,7 +84,9 @@ function App(): JSX.Element {
               path="/time"
               element={
                 <Suspense>
-                  <TimePage />
+                  <div className="p-2">
+                    <TimePage />
+                  </div>
                 </Suspense>
               }
             />
@@ -85,7 +94,9 @@ function App(): JSX.Element {
               path="/settings"
               element={
                 <Suspense>
-                  <SettingsPage />
+                  <div className="p-2">
+                    <SettingsPage />
+                  </div>
                 </Suspense>
               }
             />
@@ -105,7 +116,6 @@ function App(): JSX.Element {
                 </Suspense>
               }
             />
-
             <Route path="*" element={<Toast type="error" message={formatMessage({ id: "nav.error.page-not-found" })} allowClose={false} />} />
           </Routes>
         </div>

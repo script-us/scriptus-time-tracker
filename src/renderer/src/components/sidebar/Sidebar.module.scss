@@ -21,7 +21,8 @@
 
 .sidebar {
   width: 250px;
-  height: calc(100vh - 64px);
+  // height: calc(100vh - 64px);
+  height: 100%;
   background-color: var(--color-background);
   padding: 20px 0;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -31,11 +32,37 @@
   align-items: center;
   flex-direction: column;
   .listItemButton {
+    color: white;
     &:hover {
-      background-color: var(--color-primary);
+      background-color: #1d4ed8;
+      // .listItem {
+      //   color: #d1d5db;
+      // }
+    }
+    .dashboardIcon {
+      color: white;
     }
   }
+  .active {
+    background-color: #1e40af;
+  }
+}
+@media (prefers-color-scheme: dark) {
   .listItem {
-    color: #d1d5db;
+    color: white;
+  }
+  .dashboardIcon {
+    color: white;
+  }
+  .sidebar {
+    box-shadow: 0px 0 5px #1d4ed8;
+    .active {
+      background-color: #1d4ed8;
+    }
+    .listItemButton {
+      &:hover {
+        background-color: #1e40af;
+      }
+    }
   }
 }

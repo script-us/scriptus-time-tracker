@@ -4,8 +4,9 @@
     margin-left: auto;
     padding: 24px;
   }
+
   .filterSection {
-    padding-top: 30px;
+    padding: 10px;
     .dateFilter {
       display: flex;
       align-items: center;
@@ -13,25 +14,17 @@
       padding-top: 30px;
     }
   }
-
-  // .tableMainSection {
-  // height: calc(100vh - 180px);
-  // width: 100%;
-  // > div > div > div {
-  //   &::-webkit-scrollbar {
-  //     height: 3px;
-  //   }
-  //   &::-webkit-scrollbar-track {
-  //     background: $grey;
-  //     border-radius: 5px;
-  //   }
-  //   &::-webkit-scrollbar-thumb {
-  //     background: $light-grey;
-  //     border-radius: 5px;
-  //   }
-  // }
-  // }
   .whiteText {
     color: #d1d5db !important;
+  }
+  .timFilters {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .fieldset {
+    box-shadow: 0px 0px 5px #1d4ed8;
   }
 }
