@@ -118,30 +118,14 @@ body {
       --color-field-border: theme("colors.dark.600");
       --color-field-placeholder: theme("colors.gray.500");
     }
-    .css-pqjvzy-MuiSvgIcon-root-MuiSelect-icon {
-      color: white !important;
-    }
-    .css-rtrcn9-MuiTablePagination-root {
-      color: white !important;
-    }
-
-    .css-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar .MuiTablePagination-actions > button {
-      color: white !important;
-    }
-    .MuiOutlinedInput-root fieldset {
-      border-color: #1d4ed8 !important;
-    }
-    .MuiOutlinedInput-root svg {
-      color: white !important;
-    }
-    .css-md26zr-MuiInputBase-root-MuiOutlinedInput-root {
-      color: white !important;
+    .css-1st8yxe-MuiPickersLayout-root {
+      background-color: #1f1f1f !important;
     }
     .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
       color: white !important;
     }
-    .css-z17wx0-MuiPaper-root-MuiPickersPopper-paper {
-      background-color: #1f1f1f !important;
+    .css-10wpov9-MuiTypography-root {
+      color: white;
     }
     .css-rhmlg1-MuiTypography-root-MuiDayCalendar-weekDayLabel {
       color: white !important;
@@ -186,4 +170,7 @@ input[name="done_ratio"]::-webkit-slider-thumb {
 .css-1st8yxe-MuiPickersLayout-root {
   display: flex !important;
   flex-direction: row-reverse !important;
+}
+.MuiDateRangeCalendar-root > div:first-child {
+  display: none;
 }

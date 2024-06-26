@@ -19,6 +19,7 @@ import useSettings from "../hooks/useSettings";
 import { LANGUAGES } from "../provider/IntlProvider";
 import { Settings } from "../provider/SettingsProvider";
 import { formatHoursUsually } from "../utils/date";
+import { useNavigate } from "react-router-dom";
 
 const LANGUAGE_FLAGS: Record<(typeof LANGUAGES)[number], FlagComponent> = {
   en: GB,
@@ -27,6 +28,7 @@ const LANGUAGE_FLAGS: Record<(typeof LANGUAGES)[number], FlagComponent> = {
 };
 
 const SettingsPage = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { formatMessage } = useIntl();
   const { settings, setSettings } = useSettings();
@@ -63,6 +65,9 @@ const SettingsPage = () => {
           setSubmitting(false);
           setSaved(true);
           setEditRedmineInstance(false);
+          if (!myAccount?.isError) {
+            navigate("/dashboard");
+          }
         }}
       >
         {({ isSubmitting, touched, errors, values }) => (

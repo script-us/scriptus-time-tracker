@@ -5,13 +5,13 @@ import { useRedmineApi } from "../provider/RedmineApiProvider";
 const AUTO_REFRESH_DATA_INTERVAL = 1000;
 const STALE_DATA_TIME = 1000;
 
-const useTimeEntries = (from: Date, to: Date, user_id?: string) => {
+const useTimeEntries = (from: Date, to: Date, user_id: number[] | string, project_id: number[]) => {
   const redmineApi = useRedmineApi();
 
   const entriesQuery = useInfiniteQuery({
-    queryKey: ["timeEntries", from, to],
+    queryKey: ["timeEntries", from, to, user_id, project_id],
     initialPageParam: 0,
-    queryFn: ({ pageParam }) => redmineApi.getAllTimeEntries(from, to, pageParam * 100, 100, user_id),
+    queryFn: ({ pageParam }) => redmineApi.getAllTimeEntries(from, to, pageParam * 100, 100, user_id, project_id),
     getNextPageParam: (lastPage, allPages) => (lastPage?.length === 100 ? allPages?.length : undefined),
     staleTime: STALE_DATA_TIME,
     // refetchInterval: AUTO_REFRESH_DATA_INTERVAL,

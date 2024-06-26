@@ -1,6 +1,8 @@
 import { AxiosInstance } from "axios";
 import { formatISO } from "date-fns";
 import { TAccount, TCreateTimeEntry, TIssue, TIssuesPriority, TMembership, TProject, TReference, TSearchResult, TTimeEntry, TTimeEntryActivity, TUpdateIssue, TVersion } from "../types/redmine";
+import { buildQueryParams } from "@renderer/helper";
+
 export class RedmineApi {
   private instance: AxiosInstance;
   constructor(instance: AxiosInstance) {
@@ -88,17 +90,32 @@ export class RedmineApi {
   }
 
   // All Time entries
-  async getAllTimeEntries(from: Date, to: Date, offset = 0, limit = 100, user_id?: string): Promise<TTimeEntry[]> {
+  async getAllTimeEntries(from: Date, to: Date, offset = 0, limit = 100, user_ids?: number[] | string, project_ids?: number[]): Promise<TTimeEntry[]> {
     let url = `/time_entries.json?offset=${offset}&limit=${limit}&from=${formatISO(from, { representation: "date" })}&to=${formatISO(to, { representation: "date" })}`;
 
-    if (user_id !== undefined && Number(user_id) !== 0) {
-      url += `&user_id=${Number(user_id)}`;
+    if (user_ids !== "me") {
+      const queryParams = buildQueryParams({
+        user_id: (user_ids as number[]) || [],
+        project_id: project_ids || [],
+      });
+
+      if (queryParams) {
+        url += `&${queryParams}`;
+      }
+    } else {
+      url += `&user_id=me`;
     }
+
     return this.instance.get(url).then((res) => res.data.time_entries);
   }
 
   // All Users
   async getAllUsers() {
     return this.instance.get(`users.json`).then((res) => res.data.users);
+  }
+
+  // Current User
+  async getCurrentUser() {
+    return this.instance.get(`users/current.json`).then((res) => res.data.user);
   }
 }

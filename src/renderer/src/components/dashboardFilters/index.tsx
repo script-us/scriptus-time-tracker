@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-import { Box, Chip, Divider, FormControl, Grid, List, ListItem, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import { Box, FormControl, Grid, List, ListItem, MenuItem, Select } from "@mui/material";
 import styles from "./DashboardFilters.module.scss";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import Calendar from "@mui/icons-material/Event";
@@ -8,23 +8,23 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { DateRange } from "@mui/x-date-pickers-pro/models";
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
-import { StaticDateRangePicker } from "@mui/x-date-pickers-pro/StaticDateRangePicker";
 import { PickersShortcutsItem, PickersShortcutsProps } from "@mui/x-date-pickers/PickersShortcuts";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import Button from "../general/Button";
-import { endOfMonth, startOfDay, subDays, subMonths } from "date-fns";
 import useUsers from "@renderer/hooks/useUsers";
-import useTimeEntries from "@renderer/hooks/useTimeEntries";
-
-const names = ["Oliver Hansen", "Van Henry", "April Tucker", "Ralph Hubbard", "Omar Alexander", "Carlos Abbott", "Miriam Wagner", "Bradley Wilkerson", "Virginia Andrews", "Kelly Snyder"];
+import useCurrentUser from "@renderer/hooks/useCurrentUser";
+import { TProject } from "@renderer/types/redmine";
+import { DateInfo } from "../dashboard";
 
 interface IDashboardFiltersProps {
-  projects;
-  setOpen;
-  setDateInfo;
-  dateInfo;
-  refetch;
-  setSelectedUserId;
+  projects: TProject[];
+  setOpen: (args: boolean) => void;
+  setDateInfo: (args: DateInfo) => void;
+  dateInfo: DateInfo;
+  setSelectedUserId: (args: number[]) => void;
+  selectedUserId: number[];
+  setSelectedProjectId: (args: number[]) => void;
+  selectedProjectId: number[];
 }
 
 const shortcutsItems: PickersShortcutsItem<DateRange<Dayjs>>[] = [
@@ -66,43 +66,87 @@ const shortcutsItems: PickersShortcutsItem<DateRange<Dayjs>>[] = [
     },
   },
 ];
+const darkModeStyles = {
+  backgroundColor: "#1F1F1F",
+  color: "white",
+};
 
-const DashboardFilters = ({ projects, setOpen, setDateInfo, dateInfo, refetch, setSelectedUserId }: IDashboardFiltersProps) => {
-  const allUsersData = useUsers();
+const MenuProps = {
+  PaperProps: {
+    sx: {
+      "@media (prefers-color-scheme: dark)": {
+        ...darkModeStyles,
+      },
+    },
+  },
+};
+
+const DashboardFilters = ({ projects, setOpen, setDateInfo, dateInfo, setSelectedUserId, selectedUserId, selectedProjectId, setSelectedProjectId }: IDashboardFiltersProps) => {
+  const { data: currentUser } = useCurrentUser();
+  const isAdmin = currentUser?.admin === true;
+  const allUsersData = useUsers({ enabled: isAdmin });
   const [selectedProject, setSelectedProject] = React.useState<string[]>([]);
   const [userName, setUserName] = React.useState<string[]>([]);
-  const [localData, setLocalData] = useState({ ...dateInfo, userId: [] });
+  const [localData, setLocalData] = useState({ ...dateInfo, userId: selectedUserId, projectId: selectedProjectId });
 
-  const today = startOfDay(new Date());
-  // const { data: entries, refetch, isLoading } = useTimeEntries(dateInfo.from, dateInfo.to);
-
-  const projectData = projects.map((project) => ({
+  const projectData = projects?.map((project) => ({
     id: project.id,
     projectName: project.name,
   }));
+
   const userData = allUsersData?.data?.map((user) => ({
     id: user.id,
     fullName: `${user.firstname} ${user.lastname}`,
   }));
 
-  const handleChange = (event) => {
+  useEffect(() => {
+    if (allUsersData?.data) {
+      const initialUserNames = selectedUserId
+        ?.map((id) => {
+          const user = allUsersData?.data?.find((user) => user.id === id);
+          return user ? `${user.firstname} ${user.lastname}` : null;
+        })
+        .filter((name) => name !== null);
+      setUserName(initialUserNames as string[]);
+
+      const initialProjectsNames = selectedProjectId
+        ?.map((id) => {
+          const project = projects?.find((project) => project.id === id);
+          return project ? project.name : null;
+        })
+        ?.filter((name) => name !== null);
+      setSelectedProject(initialProjectsNames as string[]);
+    }
+  }, []);
+
+  const handleProjectsChange = (event) => {
     const selectedProjectName = event.target.value;
     setSelectedProject(selectedProjectName);
+
+    const selectedIds = selectedProjectName
+      ?.map((name) => {
+        const project = projectData?.find((project) => project.projectName === name);
+        return project ? project.id : null;
+      })
+      ?.filter((id) => id !== null);
+
+    setLocalData((prevState) => ({
+      ...prevState,
+      projectId: selectedIds,
+    }));
   };
 
   const handleUsersChange = (event) => {
     const selectedFullName = event.target.value;
-    console.log("event.target.value: ", event.target.value);
     setUserName(selectedFullName);
 
     const selectedIds = selectedFullName
-      .map((name) => {
-        const user = userData.find((user) => user.fullName === name);
+      ?.map((name) => {
+        const user = userData?.find((user) => user.fullName === name);
         return user ? user.id : null;
       })
-      .filter((id) => id !== null);
+      ?.filter((id) => id !== null);
 
-    console.log("selectedIds: ", selectedIds);
     setLocalData((prevState) => ({
       ...prevState,
       userId: selectedIds,
@@ -116,7 +160,7 @@ const DashboardFilters = ({ projects, setOpen, setDateInfo, dateInfo, refetch, s
       return null;
     }
 
-    const resolvedItems = items.map((item) => {
+    const resolvedItems = items?.map((item) => {
       const newValue = item.getValue({ isValid });
 
       return {
@@ -140,7 +184,7 @@ const DashboardFilters = ({ projects, setOpen, setDateInfo, dateInfo, refetch, s
             },
           })}
         >
-          {resolvedItems.map((item, index) => {
+          {resolvedItems?.map((item, index) => {
             return (
               <div key={index}>
                 <ListItem key={item.label}>
@@ -156,58 +200,112 @@ const DashboardFilters = ({ projects, setOpen, setDateInfo, dateInfo, refetch, s
     );
   }
 
-  const handleApplyButtonClick = () => {
-    console.log("localData: ", localData);
+  const handleApplyClick = () => {
     setDateInfo({ from: localData.from, to: localData.to });
     setSelectedUserId(localData.userId);
-    refetch();
+    setSelectedProjectId(localData.projectId);
+    setOpen(false);
+  };
+
+  const handleCancelClick = () => {
     setOpen(false);
   };
 
   const handleDateChange = (newValue) => {
     setLocalData((prevState) => ({
       ...prevState,
-      from: newValue[0].$d,
-      to: newValue[1].$d,
+      from: newValue[0]?.$d,
+      to: newValue[1]?.$d,
     }));
   };
 
   return (
     <div className={styles.main}>
       <div className={styles.leftSec}>
-        <Grid container spacing={10}>
-          <Grid item xs={6} className={styles.container}>
-            <label className={styles.label}>Projects</label>
-            <FormControl sx={{ width: 500, paddingTop: "20px" }}>
-              <Select labelId="demo-multiple-name-label" id="demo-multiple-name" multiple value={selectedProject} onChange={handleChange}>
-                {projectData.map((project, index) => (
-                  <MenuItem key={`projectId-${index}`} value={project.projectName}>
-                    {project.projectName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+        {currentUser?.admin ? (
+          <Grid container spacing={10}>
+            <Grid item xs={6} className={styles.container}>
+              <label className={styles.label}>Projects</label>
+              <FormControl sx={{ width: 510, paddingTop: "20px" }}>
+                <Select
+                  labelId="demo-multiple-name-label"
+                  id="demo-multiple-name"
+                  multiple
+                  value={selectedProject}
+                  onChange={handleProjectsChange}
+                  MenuProps={MenuProps}
+                  sx={{
+                    "@media (prefers-color-scheme: dark)": {
+                      ".MuiOutlinedInput-notchedOutline": {
+                        borderColor: "white",
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#1d4ed8",
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#1d4ed8",
+                      },
+                      ".MuiSvgIcon-root ": {
+                        fill: "white",
+                      },
+                    },
+                  }}
+                >
+                  {projectData?.map((project, index) => (
+                    <MenuItem key={`projectId-${index}`} value={project.projectName}>
+                      {project.projectName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
-        </Grid>
-        <Grid container spacing={10}>
-          <Grid item xs={6} className={styles.container}>
-            <label className={styles.label}>Users</label>
-            <FormControl sx={{ width: 500, paddingTop: "20px" }}>
-              <Select labelId="demo-multiple-name-label" id="demo-multiple-name" multiple value={userName} onChange={handleUsersChange}>
-                {userData.map((name, index) => (
-                  <MenuItem key={index} value={name.fullName}>
-                    {name.fullName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+        ) : null}
+        {currentUser?.admin ? (
+          <Grid container spacing={10}>
+            <Grid item xs={6} className={styles.container}>
+              <label className={styles.label}>Users</label>
+              <FormControl sx={{ width: 510, paddingTop: "20px" }}>
+                <Select
+                  labelId="demo-multiple-name-label"
+                  id="demo-multiple-name"
+                  multiple
+                  value={userName}
+                  onChange={handleUsersChange}
+                  MenuProps={MenuProps}
+                  sx={{
+                    "@media (prefers-color-scheme: dark)": {
+                      ".MuiOutlinedInput-notchedOutline": {
+                        borderColor: "white",
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#1d4ed8",
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#1d4ed8",
+                      },
+                      ".MuiSvgIcon-root ": {
+                        fill: "white",
+                      },
+                    },
+                  }}
+                >
+                  {userData?.map((name, index) => (
+                    <MenuItem key={index} value={name.fullName}>
+                      {name.fullName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
-        </Grid>
+        ) : null}
         <div className={styles.container}>
           <label className={styles.label}>Date</label>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DemoContainer components={["SingleInputDateRangeField"]}>
               <DateRangePicker
+                value={[dayjs(dateInfo?.from), dayjs(dateInfo?.to)]}
                 slots={{ field: SingleInputDateRangeField, shortcuts: CustomRangeShortcuts }}
                 name="allowedRange"
                 slotProps={{
@@ -219,26 +317,55 @@ const DashboardFilters = ({ projects, setOpen, setDateInfo, dateInfo, refetch, s
                     InputProps: {
                       endAdornment: <Calendar sx={{ cursor: "pointer" }} />,
                       sx: {
-                        color: "white",
+                        "@media (prefers-color-scheme: dark)": {
+                          color: "white",
+                        },
                       },
                     },
                   },
                   leftArrowIcon: {
-                    sx: { color: "white" },
+                    sx: {
+                      "@media (prefers-color-scheme: dark)": {
+                        color: "white",
+                      },
+                    },
                   },
                   rightArrowIcon: {
-                    sx: { color: "white" },
+                    sx: {
+                      "@media (prefers-color-scheme: dark)": {
+                        color: "white",
+                      },
+                    },
                   },
                 }}
                 calendars={2}
                 onChange={handleDateChange}
+                sx={{
+                  "@media (prefers-color-scheme: dark)": {
+                    ".MuiOutlinedInput-notchedOutline": {
+                      borderColor: "white",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1d4ed8",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1d4ed8!important",
+                    },
+                    ".MuiSvgIcon-root ": {
+                      fill: "white",
+                    },
+                  },
+                }}
               />
             </DemoContainer>
           </LocalizationProvider>
         </div>
         <div>
-          <Button className={styles.applyBtn} onClick={handleApplyButtonClick}>
+          <Button className={styles.applyBtn} onClick={handleApplyClick}>
             Apply
+          </Button>
+          <Button className="ml-5" onClick={handleCancelClick}>
+            Cancel
           </Button>
         </div>
       </div>
