@@ -33,6 +33,15 @@ const useMyIssues = (additionalIssuesIds: number[], search?: SearchQuery, filter
     refetchInterval: AUTO_REFRESH_DATA_INTERVAL,
   });
 
+  const issuesByProjectIdQuery = useInfiniteQuery({
+    queryKey: ["issuesByProjectId"],
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) => redmineApi.getOpenIssuesByProject(6, pageParam * 100, 100),
+    getNextPageParam: (lastPage, allPages) => (lastPage?.length === 100 ? allPages?.length : undefined),
+    staleTime: STALE_DATA_TIME,
+    refetchInterval: AUTO_REFRESH_DATA_INTERVAL,
+  });
+
   // auto fetch all pages
   useEffect(() => {
     if (issuesQuery.hasNextPage && !issuesQuery.isFetchingNextPage) issuesQuery.fetchNextPage();
@@ -40,9 +49,13 @@ const useMyIssues = (additionalIssuesIds: number[], search?: SearchQuery, filter
   useEffect(() => {
     if (additionalIssuesQuery.hasNextPage && !additionalIssuesQuery.isFetchingNextPage) additionalIssuesQuery.fetchNextPage();
   }, [additionalIssuesQuery]);
+  useEffect(() => {
+    if (issuesByProjectIdQuery.hasNextPage && !issuesByProjectIdQuery.isFetchingNextPage) issuesByProjectIdQuery.fetchNextPage();
+  }, [issuesByProjectIdQuery]);
 
   let issues = issuesQuery.data?.pages?.flat() ?? [];
   issues.push(...(additionalIssuesQuery.data?.pages?.flat().filter((issue) => !issues.find((iss) => iss.id === issue.id)) ?? []));
+  issues.push(...(issuesByProjectIdQuery.data?.pages?.flat().filter((issue) => !issues.find((iss) => iss.id === issue.id)) ?? []));
 
   // filter by project (search in project)
   if (search?.inProject) {

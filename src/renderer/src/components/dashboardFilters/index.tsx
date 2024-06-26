@@ -76,6 +76,11 @@ const MenuProps = {
     sx: {
       "@media (prefers-color-scheme: dark)": {
         ...darkModeStyles,
+        "& .MuiMenuItem-root": {
+          "&:hover": {
+            backgroundColor: "#333",
+          },
+        },
       },
     },
   },

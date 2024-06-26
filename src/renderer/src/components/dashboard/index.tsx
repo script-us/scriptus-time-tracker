@@ -114,7 +114,7 @@ const Dashboard = () => {
           <div className={styles.dateFilter}>
             <Button onClick={onFilterClick}>Filter</Button>
           </div>
-          <div>
+          <div style={{ height: "70vh" }}>
             <DataGrid
               rows={rows}
               columns={columns}
