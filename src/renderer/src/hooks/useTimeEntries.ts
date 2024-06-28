@@ -2,8 +2,8 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useRedmineApi } from "../provider/RedmineApiProvider";
 
-const AUTO_REFRESH_DATA_INTERVAL = 1000;
-const STALE_DATA_TIME = 1000;
+const AUTO_REFRESH_DATA_INTERVAL = 1000 * 60 * 15;
+const STALE_DATA_TIME = 1000 * 60;
 
 const useTimeEntries = (from: Date, to: Date, user_id: number[] | string, project_id: number[]) => {
   const redmineApi = useRedmineApi();

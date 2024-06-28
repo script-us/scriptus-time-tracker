@@ -307,12 +307,12 @@ const CreateTimeEntryModal = ({ issue, time, isPause, onClose, onSuccess }: Prop
                   )}
 
                   <FastField
-                    type="text"
+                    type="textarea"
                     name="comments"
                     required
                     title={formatMessage({ id: "issues.modal.add-spent-time.comments" })}
                     placeholder={formatMessage({ id: "issues.modal.add-spent-time.comments" })}
-                    as={InputField}
+                    as={TextareaField}
                     size="sm"
                     error={touched.comments && errors.comments}
                     autoFocus

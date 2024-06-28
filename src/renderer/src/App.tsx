@@ -38,6 +38,11 @@ function App(): JSX.Element {
         <Navbar
           navigation={[
             {
+              href: "/dashboard",
+              icon: <FontAwesomeIcon icon={faHome} />,
+              name: formatMessage({ id: "Dashboard" }),
+            },
+            {
               href: `/issues`,
               icon: <FontAwesomeIcon icon={faList} />,
               name: formatMessage({ id: "nav.tabs.issues" }),
@@ -51,11 +56,6 @@ function App(): JSX.Element {
               href: "/settings",
               icon: <FontAwesomeIcon icon={faGear} />,
               name: formatMessage({ id: "nav.tabs.settings" }),
-            },
-            {
-              href: "/dashboard",
-              icon: <FontAwesomeIcon icon={faHome} />,
-              name: formatMessage({ id: "Dashboard" }),
             },
           ]}
         />
